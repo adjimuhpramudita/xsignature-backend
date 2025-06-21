@@ -50,10 +50,18 @@ try {
   console.error('Error with uploads directory:', error);
 }
 
-// Static files
+// Static files - Perbaikan untuk menangani file yang tidak ditemukan
 app.use('/uploads', (req, res, next) => {
   console.log('Static file request:', req.url);
-  next();
+  // Cek apakah file ada
+  const filePath = path.join(uploadsDir, req.url);
+  if (fs.existsSync(filePath)) {
+    next();
+  } else {
+    // Jika file tidak ada, kirim placeholder.svg sebagai fallback
+    console.log(`File tidak ditemukan: ${filePath}`);
+    res.redirect('/placeholder.svg?text=No+Image');
+  }
 }, express.static(uploadsDir));
 
 // Add a test endpoint to verify upload functionality
