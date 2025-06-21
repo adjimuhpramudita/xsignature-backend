@@ -58,9 +58,21 @@ app.use('/uploads', (req, res, next) => {
   if (fs.existsSync(filePath)) {
     next();
   } else {
-    // Jika file tidak ada, kirim placeholder.svg sebagai fallback
-    console.log(`File tidak ditemukan: ${filePath}`);
-    res.redirect('/placeholder.svg?text=No+Image');
+    // Jika file tidak ada, langsung kirimkan SVG placeholder tanpa redirect
+    console.log('File tidak ditemukan: ${filePath}');
+    const width = 300;
+    const height = 200;
+    const text = 'No Image';
+    
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+        <rect width="100%" height="100%" fill="#e9e9e9"/>
+        <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" dominant-baseline="middle" fill="#666666">${text}</text>
+      </svg>
+    `;
+    
+    res.setHeader('Content-Type', 'image/svg+xml');
+    res.send(svg);
   }
 }, express.static(uploadsDir));
 
@@ -113,7 +125,7 @@ app.get('/api/direct-test/schedules', async (req, res) => {
        LIMIT 10`
     );
     
-    console.log(`Direct test found ${result.rows.length} booking schedules`);
+    console.log('Direct test found ${result.rows.length} booking schedules');
     res.json(result.rows);
   } catch (error) {
     console.error('Error in direct test endpoint:', error);
@@ -155,10 +167,10 @@ app.use(errorHandler);
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Static files served from: ${uploadsDir}`);
-  console.log(`Test URL: http://localhost:${PORT}/api/test-uploads`);
+  console.log('Server running on port ${PORT}');
+  console.log('Static files served from: ${uploadsDir}');
+  console.log('Test URL: http://localhost:${PORT}/api/test-uploads');
 });
 
 // For testing purposes
-module.exports = app; 
+module.exports = app;
